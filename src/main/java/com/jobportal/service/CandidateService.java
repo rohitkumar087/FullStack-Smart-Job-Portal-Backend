@@ -8,6 +8,9 @@ import com.jobportal.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.Collections;
+
 @Service
 public class CandidateService {
 
@@ -22,7 +25,23 @@ public class CandidateService {
                 .orElseThrow(() -> new UserNotFoundException("User Not Found"));
 
         return candidateRepository.findByUser(user)
-                .orElseThrow(() -> new RuntimeException("Candidate profile not found"));
+                .orElseGet(()->{
+                    Candidate candidate = new Candidate();
+
+                    candidate.setUser(user);
+                    candidate.setPhone("");
+                    candidate.setLocation("");
+                    candidate.setTitle("");
+                    candidate.setExperience("");
+                    candidate.setExpectedSalary(null);
+                    candidate.setResumeUrl("");
+                    candidate.setPortfolioUrl("");
+                    candidate.setLinkedinUrl("");
+                    candidate.setGithubUrl("");
+                    candidate.setSkills(new ArrayList<>());
+
+                    return candidateRepository.save(candidate);
+                });
     }
 
     public Candidate updateMyProfile(String email, Candidate updatedCandidate) {

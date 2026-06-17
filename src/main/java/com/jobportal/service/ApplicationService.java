@@ -1,6 +1,6 @@
 package com.jobportal.service;
 
-import com.jobportal.dto.ApplicationRequest;
+import  com.jobportal.dto.ApplicationRequest;
 import com.jobportal.entity.*;
 import com.jobportal.exception.AlreadyAppliedException;
 import com.jobportal.exception.JobNotFoundException;
@@ -25,6 +25,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.List;
+
 
 @Service
 public class ApplicationService {
