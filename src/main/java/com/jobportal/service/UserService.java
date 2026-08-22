@@ -7,6 +7,7 @@ import com.jobportal.entity.CompanyProfile;
 import com.jobportal.entity.RecruiterStatus;
 import com.jobportal.entity.Role;
 import com.jobportal.entity.User;
+import com.jobportal.exception.EmailAlreadyExist;
 import com.jobportal.exception.UserNotFoundException;
 import com.jobportal.repository.CompanyProfileRepository;
 import com.jobportal.repository.UserRepository;
@@ -41,6 +42,10 @@ public class UserService {
     public User register(RegisterRequest request){
         if (request.getRole() == Role.ADMIN) {
             throw new RuntimeException("Admin registration is not allowed");
+        }
+
+        if(userRepository.existsByEmail(request.getEmail())){
+            throw new EmailAlreadyExist("Email already exists in the data");
         }
 
         User user = new User();

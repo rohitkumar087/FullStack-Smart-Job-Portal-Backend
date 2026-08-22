@@ -4,6 +4,7 @@ import com.jobportal.dto.ApplicationRequest;
 import com.jobportal.entity.Application;
 import com.jobportal.entity.ApplicationStatus;
 import com.jobportal.service.ApplicationService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
@@ -26,8 +27,13 @@ public class ApplicationController {
 
     @PreAuthorize("hasRole('CANDIDATE')")
     @PostMapping(value = "/apply/{jobId}",consumes = "multipart/form-data")
-    public String applyJob(@PathVariable Long jobId, @ModelAttribute ApplicationRequest request,@RequestParam("resume") MultipartFile resume , Authentication authentication) throws IOException {
+    public String applyJob(@PathVariable Long jobId, @Valid @ModelAttribute ApplicationRequest request, @RequestParam(value = "resume",required = false) MultipartFile resume , Authentication authentication) throws IOException {
         String email = authentication.getName();
+
+        if(resume == null || resume.isEmpty()) {
+            throw new RuntimeException("Resume is required");
+        }
+
         return applicationService.applyJob(jobId,email,request,resume);
     }
 

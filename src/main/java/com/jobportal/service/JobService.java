@@ -78,7 +78,7 @@ public class JobService {
                 .orElseThrow(()-> new JobNotFoundException("Job not found"));
 
         if(!job.getRecruiter().getEmail().equals(email)){
-            throw new AccessDeniedException("you are not allowed to delete this job");
+            throw new AccessDeniedException("you are not allowed to update this job");
         }
 
         job.setTitle(updatedJob.getTitle());

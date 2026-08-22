@@ -6,6 +6,7 @@ import com.jobportal.dto.LoginResponse;
 import com.jobportal.dto.RegisterRequest;
 import com.jobportal.entity.User;
 import com.jobportal.service.UserService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,7 +19,7 @@ public class AuthController {
     public UserService userService;
 
     @PostMapping("/register")
-    public User register(@RequestBody RegisterRequest request) {
+    public User register(@Valid @RequestBody RegisterRequest request) {
         return userService.register(request);
     }
 

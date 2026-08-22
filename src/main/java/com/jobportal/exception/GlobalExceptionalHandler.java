@@ -70,5 +70,30 @@ public class GlobalExceptionalHandler {
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(EmailAlreadyExist.class)
+    public ResponseEntity<ErrorResponse> emailAlreadyExist(EmailAlreadyExist e){
+        ErrorResponse error = new ErrorResponse(
+                e.getMessage(),
+               400,
+                LocalDateTime.now()
+        );
+
+        return new ResponseEntity<>(error,HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<ErrorResponse> handleRuntimeException(RuntimeException e) {
+
+        ErrorResponse error = new ErrorResponse(
+                e.getMessage(),
+                400,
+                LocalDateTime.now()
+        );
+
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(error);
+    }
+
 
 }
