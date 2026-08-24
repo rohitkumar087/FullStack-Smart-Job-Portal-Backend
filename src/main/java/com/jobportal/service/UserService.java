@@ -44,6 +44,10 @@ public class UserService {
             throw new RuntimeException("Admin registration is not allowed");
         }
 
+        if(!request.getName().contains(" ")){
+            throw new RuntimeException("Name must contain the last name also");
+        }
+
         if(userRepository.existsByEmail(request.getEmail())){
             throw new EmailAlreadyExist("Email already exists in the data");
         }
