@@ -4,8 +4,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -23,41 +23,55 @@ import java.util.List;
 @EnableMethodSecurity
 @Configuration
 public class SecurityConfig {
+
     @Autowired
     private JwtFilter jwtFilter;
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration config){
+    public AuthenticationManager authenticationManager(
+            AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtFilter jwtFilter) throws Exception{
+    public SecurityFilterChain securityFilterChain(
+            HttpSecurity http,
+            JwtFilter jwtFilter) throws Exception {
+
         http
                 .cors(Customizer.withDefaults())
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(ex -> ex
                         .authenticationEntryPoint((request, response, authException) -> {
-                            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 401
-                            response.getWriter().write("Unauthorized: " + authException.getMessage());
+                            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                            response.getWriter().write(
+                                    "Unauthorized: " + authException.getMessage()
+                            );
                         })
                         .accessDeniedHandler((request, response, accessDeniedException) -> {
-                            response.setStatus(HttpServletResponse.SC_FORBIDDEN); // 403
-                            response.getWriter().write("Forbidden: " + accessDeniedException.getMessage());
+                            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                            response.getWriter().write(
+                                    "Forbidden: " + accessDeniedException.getMessage()
+                            );
                         })
                 )
-                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(
+                        jwtFilter,
+                        UsernamePasswordAuthenticationFilter.class
+                )
                 .formLogin(form -> form.disable())
                 .httpBasic(Customizer.withDefaults());
+
         return http.build();
     }
 
     @Bean
-    public PasswordEncoder passwordEncoder(){
+    public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
@@ -65,7 +79,12 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
 
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:5173"));
+
+        configuration.setAllowedOrigins(List.of(
+                "http://localhost:5173",
+                "https://smart-job-portal-seven.vercel.app"
+        ));
+
         configuration.setAllowedMethods(List.of(
                 "GET",
                 "POST",
@@ -76,10 +95,12 @@ public class SecurityConfig {
 
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);
-        UrlBasedCorsConfigurationSource source =  new UrlBasedCorsConfigurationSource();
+
+        UrlBasedCorsConfigurationSource source =
+                new UrlBasedCorsConfigurationSource();
+
         source.registerCorsConfiguration("/**", configuration);
 
         return source;
     }
-
 }
